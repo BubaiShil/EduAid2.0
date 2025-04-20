@@ -3,23 +3,20 @@ import cors from 'cors';
 import axios from 'axios';
 import dotenv from 'dotenv';
 
-
 dotenv.config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-
 const GEMINI_API_KEY = process.env.API_GEMI;
-
-
+const port = process.env.PORT || 4000;
 
 app.post('/generate', async (req, res) => {
     const { goal, level } = req.body;
 
     try {
-        const response = await axios.post(
+        const response = await axios.post(  
             `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
             {
                 contents: [
@@ -39,7 +36,8 @@ app.post('/generate', async (req, res) => {
             }
         );
 
-        // Gemini usually returns candidates array
+        console.log("💡 Gemini raw response:", JSON.stringify(response.data, null, 2));
+
         const generated = response.data.candidates?.[0]?.content?.parts?.[0]?.text || "Sorry, no roadmap generated.";
         res.json({ roadmap: generated });
 
@@ -53,4 +51,4 @@ app.post('/generate', async (req, res) => {
     }
 });
 
-app.listen(5000, () => console.log('✅ Server running on http://localhost:5000'));
+app.listen(port, () => console.log(`✅ Server running on ${port}`));
